@@ -1,3 +1,133 @@
+package main
+
+import (
+	"fmt"
+)
+
+// Интерфейс Visitor определяет методы для посещения каждого типа элемента
+type Visitor interface {
+	VisitCircle(*Circle) string
+	VisitRectangle(*Rectangle) string
+	VisitTriangle(*Triangle) string
+}
+
+// Shape определяет интерфейс для геометрических фигур
+type Shape interface {
+	Accept(Visitor) string
+}
+
+// Circle представляет круг
+type Circle struct {
+	Radius float64
+}
+
+func (c *Circle) Accept(v Visitor) string {
+	return v.VisitCircle(c)
+}
+
+// Rectangle представляет прямоугольник
+type Rectangle struct {
+	Width  float64
+	Height float64
+}
+
+func (r *Rectangle) Accept(v Visitor) string {
+	return v.VisitRectangle(r)
+}
+
+// Triangle представляет треугольник
+type Triangle struct {
+	Base   float64
+	Height float64
+}
+
+func (t *Triangle) Accept(v Visitor) string {
+	return v.VisitTriangle(t)
+}
+
+// AreaCalculator вычисляет площадь фигур
+type AreaCalculator struct{}
+
+func (ac *AreaCalculator) VisitCircle(c *Circle) string {
+	area := 3.14 * c.Radius * c.Radius
+	return fmt.Sprintf("Площадь круга: %.2f", area)
+}
+
+func (ac *AreaCalculator) VisitRectangle(r *Rectangle) string {
+	area := r.Width * r.Height
+	return fmt.Sprintf("Площадь прямоугольника: %.2f", area)
+}
+
+func (ac *AreaCalculator) VisitTriangle(t *Triangle) string {
+	area := 0.5 * t.Base * t.Height
+	return fmt.Sprintf("Площадь треугольника: %.2f", area)
+}
+
+// PerimeterCalculator вычисляет периметр фигур
+type PerimeterCalculator struct{}
+
+func (pc *PerimeterCalculator) VisitCircle(c *Circle) string {
+	perimeter := 2 * 3.14 * c.Radius
+	return fmt.Sprintf("Периметр круга: %.2f", perimeter)
+}
+
+func (pc *PerimeterCalculator) VisitRectangle(r *Rectangle) string {
+	perimeter := 2 * (r.Width + r.Height)
+	return fmt.Sprintf("Периметр прямоугольника: %.2f", perimeter)
+}
+
+func (pc *PerimeterCalculator) VisitTriangle(t *Triangle) string {
+	// Упрощенный расчет для равнобедренного треугольника
+	perimeter := t.Base + 2*t.Height
+	return fmt.Sprintf("Периметр треугольника: %.2f", perimeter)
+}
+
+// DrawingVisitor отрисовывает фигуры (имитация)
+type DrawingVisitor struct{}
+
+func (dv *DrawingVisitor) VisitCircle(c *Circle) string {
+	return fmt.Sprintf("Рисуем круг с радиусом %.2f", c.Radius)
+}
+
+func (dv *DrawingVisitor) VisitRectangle(r *Rectangle) string {
+	return fmt.Sprintf("Рисуем прямоугольник %.2fx%.2f", r.Width, r.Height)
+}
+
+func (dv *DrawingVisitor) VisitTriangle(t *Triangle) string {
+	return fmt.Sprintf("Рисуем треугольник с основанием %.2f и высотой %.2f", t.Base, t.Height)
+}
+
+func main() {
+	// Создаем фигуры
+	shapes := []Shape{
+		&Circle{Radius: 5},
+		&Rectangle{Width: 4, Height: 6},
+		&Triangle{Base: 3, Height: 4},
+	}
+
+	// Создаем посетителей
+	areaCalc := &AreaCalculator{}
+	perimeterCalc := &PerimeterCalculator{}
+	drawer := &DrawingVisitor{}
+
+	// Применяем посетителей к каждой фигуре
+	fmt.Println("\n=== Расчет площади ===")
+	for _, shape := range shapes {
+		fmt.Println(shape.Accept(areaCalc))
+	}
+
+	fmt.Println("\n=== Расчет периметра ===")
+	for _, shape := range shapes {
+		fmt.Println(shape.Accept(perimeterCalc))
+	}
+
+	fmt.Println("\n=== Отрисовка фигур ===")
+	for _, shape := range shapes {
+		fmt.Println(shape.Accept(drawer))
+	}
+}
+
+
 /*
 # Паттерн Посетитель (Visitor Pattern) в Go
 
@@ -179,133 +309,3 @@ type PaymentProcessor struct{
 - Разделяйте несвязанные операции
 - Обеспечивайте хорошее покрытие тестами
 */
-
-// Package main демонстрирует реализацию паттерна Посетитель (Visitor Pattern)
-package main
-
-import (
-	"fmt"
-)
-
-// Интерфейс Visitor определяет методы для посещения каждого типа элемента
-type Visitor interface {
-	VisitCircle(*Circle) string
-	VisitRectangle(*Rectangle) string
-	VisitTriangle(*Triangle) string
-}
-
-// Shape определяет интерфейс для геометрических фигур
-type Shape interface {
-	Accept(Visitor) string
-}
-
-// Circle представляет круг
-type Circle struct {
-	Radius float64
-}
-
-func (c *Circle) Accept(v Visitor) string {
-	return v.VisitCircle(c)
-}
-
-// Rectangle представляет прямоугольник
-type Rectangle struct {
-	Width  float64
-	Height float64
-}
-
-func (r *Rectangle) Accept(v Visitor) string {
-	return v.VisitRectangle(r)
-}
-
-// Triangle представляет треугольник
-type Triangle struct {
-	Base   float64
-	Height float64
-}
-
-func (t *Triangle) Accept(v Visitor) string {
-	return v.VisitTriangle(t)
-}
-
-// AreaCalculator вычисляет площадь фигур
-type AreaCalculator struct{}
-
-func (ac *AreaCalculator) VisitCircle(c *Circle) string {
-	area := 3.14 * c.Radius * c.Radius
-	return fmt.Sprintf("Площадь круга: %.2f", area)
-}
-
-func (ac *AreaCalculator) VisitRectangle(r *Rectangle) string {
-	area := r.Width * r.Height
-	return fmt.Sprintf("Площадь прямоугольника: %.2f", area)
-}
-
-func (ac *AreaCalculator) VisitTriangle(t *Triangle) string {
-	area := 0.5 * t.Base * t.Height
-	return fmt.Sprintf("Площадь треугольника: %.2f", area)
-}
-
-// PerimeterCalculator вычисляет периметр фигур
-type PerimeterCalculator struct{}
-
-func (pc *PerimeterCalculator) VisitCircle(c *Circle) string {
-	perimeter := 2 * 3.14 * c.Radius
-	return fmt.Sprintf("Периметр круга: %.2f", perimeter)
-}
-
-func (pc *PerimeterCalculator) VisitRectangle(r *Rectangle) string {
-	perimeter := 2 * (r.Width + r.Height)
-	return fmt.Sprintf("Периметр прямоугольника: %.2f", perimeter)
-}
-
-func (pc *PerimeterCalculator) VisitTriangle(t *Triangle) string {
-	// Упрощенный расчет для равнобедренного треугольника
-	perimeter := t.Base + 2*t.Height
-	return fmt.Sprintf("Периметр треугольника: %.2f", perimeter)
-}
-
-// DrawingVisitor отрисовывает фигуры (имитация)
-type DrawingVisitor struct{}
-
-func (dv *DrawingVisitor) VisitCircle(c *Circle) string {
-	return fmt.Sprintf("Рисуем круг с радиусом %.2f", c.Radius)
-}
-
-func (dv *DrawingVisitor) VisitRectangle(r *Rectangle) string {
-	return fmt.Sprintf("Рисуем прямоугольник %.2fx%.2f", r.Width, r.Height)
-}
-
-func (dv *DrawingVisitor) VisitTriangle(t *Triangle) string {
-	return fmt.Sprintf("Рисуем треугольник с основанием %.2f и высотой %.2f", t.Base, t.Height)
-}
-
-func main() {
-	// Создаем фигуры
-	shapes := []Shape{
-		&Circle{Radius: 5},
-		&Rectangle{Width: 4, Height: 6},
-		&Triangle{Base: 3, Height: 4},
-	}
-
-	// Создаем посетителей
-	areaCalc := &AreaCalculator{}
-	perimeterCalc := &PerimeterCalculator{}
-	drawer := &DrawingVisitor{}
-
-	// Применяем посетителей к каждой фигуре
-	fmt.Println("\n=== Расчет площади ===")
-	for _, shape := range shapes {
-		fmt.Println(shape.Accept(areaCalc))
-	}
-
-	fmt.Println("\n=== Расчет периметра ===")
-	for _, shape := range shapes {
-		fmt.Println(shape.Accept(perimeterCalc))
-	}
-
-	fmt.Println("\n=== Отрисовка фигур ===")
-	for _, shape := range shapes {
-		fmt.Println(shape.Accept(drawer))
-	}
-}
