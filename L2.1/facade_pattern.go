@@ -1,3 +1,77 @@
+package main
+
+import "fmt"
+
+// Подсистема: Система безопасности
+type SecuritySystem struct{}
+
+func (s *SecuritySystem) Arm() {
+    fmt.Println("Система безопасности активирована")
+}
+
+func (s *SecuritySystem) Disarm() {
+    fmt.Println("Система безопасности деактивирована")
+}
+
+// Подсистема: Система освещения
+type LightingSystem struct{}
+
+func (l *LightingSystem) TurnOn() {
+    fmt.Println("Освещение включено")
+}
+
+func (l *LightingSystem) TurnOff() {
+    fmt.Println("Освещение выключено")
+}
+
+// Подсистема: Система климат-контроля
+type ClimateControl struct{}
+
+func (c *ClimateControl) SetTemperature(temp int) {
+    fmt.Printf("Установлена температура: %d градусов\n", temp)
+}
+
+// Фасад для управления умным домом
+type SmartHomeFacade struct {
+    security *SecuritySystem
+    lighting *LightingSystem
+    climate  *ClimateControl
+}
+
+// Конструктор фасада
+func NewSmartHomeFacade() *SmartHomeFacade {
+    return &SmartHomeFacade{
+        security: &SecuritySystem{},
+        lighting: &LightingSystem{},
+        climate:  &ClimateControl{},
+    }
+}
+
+// Методы фасада для типовых сценариев
+func (f *SmartHomeFacade) LeaveHome() {
+    f.security.Arm()
+    f.lighting.TurnOff()
+    f.climate.SetTemperature(18) // экономный режим
+}
+
+func (f *SmartHomeFacade) ReturnHome() {
+    f.security.Disarm()
+    f.lighting.TurnOn()
+    f.climate.SetTemperature(22) // комфортная температура
+}
+
+func main() {
+    // Использование фасада
+    smartHome := NewSmartHomeFacade()
+    
+    fmt.Println("Уходим из дома:")
+    smartHome.LeaveHome()
+    
+    fmt.Println("\nВозвращаемся домой:")
+    smartHome.ReturnHome()
+}
+
+
 /*
 # Паттерн Фасад (Facade Pattern) в Go
 
@@ -192,76 +266,3 @@ func (f *APIClientFacade) FetchData(url string) (*Response, error) {
 - Обеспечивайте правильную обработку ошибок
 - Поддерживайте хорошее покрытие тестами
 */
-
-package main
-
-import "fmt"
-
-// Подсистема: Система безопасности
-type SecuritySystem struct{}
-
-func (s *SecuritySystem) Arm() {
-    fmt.Println("Система безопасности активирована")
-}
-
-func (s *SecuritySystem) Disarm() {
-    fmt.Println("Система безопасности деактивирована")
-}
-
-// Подсистема: Система освещения
-type LightingSystem struct{}
-
-func (l *LightingSystem) TurnOn() {
-    fmt.Println("Освещение включено")
-}
-
-func (l *LightingSystem) TurnOff() {
-    fmt.Println("Освещение выключено")
-}
-
-// Подсистема: Система климат-контроля
-type ClimateControl struct{}
-
-func (c *ClimateControl) SetTemperature(temp int) {
-    fmt.Printf("Установлена температура: %d градусов\n", temp)
-}
-
-// Фасад для управления умным домом
-type SmartHomeFacade struct {
-    security *SecuritySystem
-    lighting *LightingSystem
-    climate  *ClimateControl
-}
-
-// Конструктор фасада
-func NewSmartHomeFacade() *SmartHomeFacade {
-    return &SmartHomeFacade{
-        security: &SecuritySystem{},
-        lighting: &LightingSystem{},
-        climate:  &ClimateControl{},
-    }
-}
-
-// Методы фасада для типовых сценариев
-func (f *SmartHomeFacade) LeaveHome() {
-    f.security.Arm()
-    f.lighting.TurnOff()
-    f.climate.SetTemperature(18) // экономный режим
-}
-
-func (f *SmartHomeFacade) ReturnHome() {
-    f.security.Disarm()
-    f.lighting.TurnOn()
-    f.climate.SetTemperature(22) // комфортная температура
-}
-
-func main() {
-    // Использование фасада
-    smartHome := NewSmartHomeFacade()
-    
-    fmt.Println("Уходим из дома:")
-    smartHome.LeaveHome()
-    
-    fmt.Println("\nВозвращаемся домой:")
-    smartHome.ReturnHome()
-}

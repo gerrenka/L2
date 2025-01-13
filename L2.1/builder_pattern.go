@@ -1,3 +1,98 @@
+package main
+
+import "fmt"
+
+// Product - конечный продукт
+type Computer struct {
+    CPU         string
+    RAM         int
+    Storage     int
+    GraphicsCard string
+}
+
+// Builder - интерфейс строителя
+type ComputerBuilder interface {
+    SetCPU(cpu string) ComputerBuilder
+    SetRAM(ram int) ComputerBuilder
+    SetStorage(storage int) ComputerBuilder
+    SetGraphicsCard(card string) ComputerBuilder
+    Build() *Computer
+}
+
+// Конкретный строитель
+type DesktopComputerBuilder struct {
+    computer *Computer
+}
+
+func NewDesktopComputerBuilder() ComputerBuilder {
+    return &DesktopComputerBuilder{
+        computer: &Computer{},
+    }
+}
+
+func (b *DesktopComputerBuilder) SetCPU(cpu string) ComputerBuilder {
+    b.computer.CPU = cpu
+    return b
+}
+
+func (b *DesktopComputerBuilder) SetRAM(ram int) ComputerBuilder {
+    b.computer.RAM = ram
+    return b
+}
+
+func (b *DesktopComputerBuilder) SetStorage(storage int) ComputerBuilder {
+    b.computer.Storage = storage
+    return b
+}
+
+func (b *DesktopComputerBuilder) SetGraphicsCard(card string) ComputerBuilder {
+    b.computer.GraphicsCard = card
+    return b
+}
+
+func (b *DesktopComputerBuilder) Build() *Computer {
+    return b.computer
+}
+
+// Director - управляет процессом строительства
+type ComputerAssembler struct {
+    builder ComputerBuilder
+}
+
+func NewComputerAssembler(b ComputerBuilder) *ComputerAssembler {
+    return &ComputerAssembler{builder: b}
+}
+
+// Пример предустановленной конфигурации
+func (d *ComputerAssembler) ConstructGamingPC() *Computer {
+    return d.builder.
+        SetCPU("Intel Core i9").
+        SetRAM(32).
+        SetStorage(2000).
+        SetGraphicsCard("NVIDIA RTX 4080").
+        Build()
+}
+
+func main() {
+    // Использование паттерна
+    builder := NewDesktopComputerBuilder()
+    assembler := NewComputerAssembler(builder)
+    
+    // Создание игрового компьютера
+    gamingPC := assembler.ConstructGamingPC()
+    fmt.Printf("Gaming PC: %+v\n", gamingPC)
+    
+    // Создание пользовательской конфигурации
+    customPC := builder.
+        SetCPU("AMD Ryzen 7").
+        SetRAM(16).
+        SetStorage(1000).
+        SetGraphicsCard("NVIDIA RTX 3060").
+        Build()
+    fmt.Printf("Custom PC: %+v\n", customPC)
+}
+
+
 /*
 # Паттерн Строитель (Builder Pattern) в Go
 
@@ -162,97 +257,3 @@ db := NewDatabaseBuilder().
 При правильном использовании паттерн помогает создавать чистый, поддерживаемый и расширяемый код.
 
 */
-
-package main
-
-import "fmt"
-
-// Product - конечный продукт
-type Computer struct {
-    CPU         string
-    RAM         int
-    Storage     int
-    GraphicsCard string
-}
-
-// Builder - интерфейс строителя
-type ComputerBuilder interface {
-    SetCPU(cpu string) ComputerBuilder
-    SetRAM(ram int) ComputerBuilder
-    SetStorage(storage int) ComputerBuilder
-    SetGraphicsCard(card string) ComputerBuilder
-    Build() *Computer
-}
-
-// Конкретный строитель
-type DesktopComputerBuilder struct {
-    computer *Computer
-}
-
-func NewDesktopComputerBuilder() ComputerBuilder {
-    return &DesktopComputerBuilder{
-        computer: &Computer{},
-    }
-}
-
-func (b *DesktopComputerBuilder) SetCPU(cpu string) ComputerBuilder {
-    b.computer.CPU = cpu
-    return b
-}
-
-func (b *DesktopComputerBuilder) SetRAM(ram int) ComputerBuilder {
-    b.computer.RAM = ram
-    return b
-}
-
-func (b *DesktopComputerBuilder) SetStorage(storage int) ComputerBuilder {
-    b.computer.Storage = storage
-    return b
-}
-
-func (b *DesktopComputerBuilder) SetGraphicsCard(card string) ComputerBuilder {
-    b.computer.GraphicsCard = card
-    return b
-}
-
-func (b *DesktopComputerBuilder) Build() *Computer {
-    return b.computer
-}
-
-// Director - управляет процессом строительства
-type ComputerAssembler struct {
-    builder ComputerBuilder
-}
-
-func NewComputerAssembler(b ComputerBuilder) *ComputerAssembler {
-    return &ComputerAssembler{builder: b}
-}
-
-// Пример предустановленной конфигурации
-func (d *ComputerAssembler) ConstructGamingPC() *Computer {
-    return d.builder.
-        SetCPU("Intel Core i9").
-        SetRAM(32).
-        SetStorage(2000).
-        SetGraphicsCard("NVIDIA RTX 4080").
-        Build()
-}
-
-func main() {
-    // Использование паттерна
-    builder := NewDesktopComputerBuilder()
-    assembler := NewComputerAssembler(builder)
-    
-    // Создание игрового компьютера
-    gamingPC := assembler.ConstructGamingPC()
-    fmt.Printf("Gaming PC: %+v\n", gamingPC)
-    
-    // Создание пользовательской конфигурации
-    customPC := builder.
-        SetCPU("AMD Ryzen 7").
-        SetRAM(16).
-        SetStorage(1000).
-        SetGraphicsCard("NVIDIA RTX 3060").
-        Build()
-    fmt.Printf("Custom PC: %+v\n", customPC)
-}
