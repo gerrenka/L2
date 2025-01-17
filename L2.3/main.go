@@ -1,53 +1,96 @@
 package main
 
 import (
-	"bufio"
-	"fmt"
-	"os"
-	"strconv"
-	"strings"
-	"unicode"
+    "errors"
+    "fmt"
+    "strconv"
+    "strings"
+    "unicode"
 )
 
+func unpackString(s string) (string, error) {
+    if s == "" {
+        return "", nil
+    }
+
+    var result strings.Builder
+    runes := []rune(s)
+    isEscaped := false
+    
+    // Проверка первого символа
+    if len(runes) > 0 && unicode.IsDigit(runes[0]) {
+        return "", errors.New("некорректная строка: начинается с цифры")
+    }
+
+    for i := 0; i < len(runes); i++ {
+        currentRune := runes[i]
+
+        // Обработка escape-последовательности
+        if currentRune == '\\' && !isEscaped {
+            isEscaped = true
+            continue
+        }
+
+        // Если текущий символ - цифра
+        if unicode.IsDigit(currentRune) && !isEscaped {
+            if i == 0 {
+                return "", errors.New("некорректная строка: начинается с цифры")
+            }
+
+            // Собираем все последующие цифры
+            numStr := string(currentRune)
+            for j := i + 1; j < len(runes) && unicode.IsDigit(runes[j]); j++ {
+                numStr += string(runes[j])
+                i = j
+            }
+
+            // Конвертируем строку в число
+            count, err := strconv.Atoi(numStr)
+            if err != nil {
+                return "", errors.New("ошибка при конвертации числа")
+            }
+
+            // Проверяем корректность числа повторений
+            if count <= 0 {
+                return "", errors.New("некорректное количество повторений: число должно быть положительным")
+            }
+
+            // Повторяем предыдущий символ
+            prevChar := runes[i-len(numStr)]
+            // Важно: теперь вычитаем 1 из count, так как сам символ уже записан
+            if count > 1 {
+                result.WriteString(strings.Repeat(string(prevChar), count-1))
+            }
+        } else {
+            result.WriteRune(currentRune)
+            isEscaped = false
+        }
+    }
+
+    return result.String(), nil
+}
+
 func main() {
-	reader := bufio.NewReader(os.Stdin)
-	input, _ := reader.ReadString('\n')
-	// Убираем символ новой строки в конце
-	input = strings.TrimSuffix(input, "\n")
+    // Примеры использования
+    examples := []string{
+        "a4bc2d5e",
+        "abcd",
+        "45",
+        "",
+        "qwe\\4\\5",
+        "qwe\\45",
+        "qwe\\\\5",
+        "a0",
+    }
 
-	// Дополнительно уберём пробелы по краям (если нужно)
-	trimmed := strings.TrimSpace(input)
-
-	// Если строка пустая
-	if trimmed == "" {
-		fmt.Println("")
-		return
-	}
-
-	// Если вся оставшаяся строка — это число (проверка через Atoi)
-	if _, err := strconv.Atoi(trimmed); err == nil {
-		fmt.Println("некорректная строка")
-		return
-	}
-
-	runes := []rune(input)
-	var result []rune
-
-	for i := 0; i < len(runes); i++ {
-		// Проверяем, что текущий символ — это backslash,
-		// и что впереди есть ещё символ, который — цифра
-		if runes[i] == '\\' && i+1 < len(runes) && unicode.IsDigit(runes[i+1]) {
-			// Добавляем в результат только цифру (без backslash)
-			result = append(result, runes[i+1])
-			// Пропускаем следующий символ (т. е. сдвигаем индекс ещё на 1)
-			i++
-		} else {
-			// Иначе добавляем текущий символ как есть
-			result = append(result, runes[i])
-		}
-	}
-
-	fmt.Println(string(result))
+    for _, example := range examples {
+        result, err := unpackString(example)
+        if err != nil {
+            fmt.Printf("Ошибка для строки %q: %v\n", example, err)
+        } else {
+            fmt.Printf("Результат для строки %q: %q\n", example, result)
+        }
+    }
 }
 	
 
