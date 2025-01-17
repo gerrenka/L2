@@ -58,17 +58,14 @@ func main() {
 		humanNumeric:  *humanNumeric,
 	}
 
-	// Читаем и сортируем файл
 	lines, err := readLines(args[0], options)
 	if err != nil {
 		fmt.Printf("Error reading file: %v\n", err)
 		os.Exit(1)
 	}
 
-	// Сортируем строки
 	sorted := sortLines(lines, options)
 
-	// Проверяем сортировку если установлен флаг -c
 	if options.check {
 		if !isSorted(sorted, options) {
 			fmt.Println("Input is not sorted")
@@ -78,7 +75,6 @@ func main() {
 		return
 	}
 
-	// Выводим результат
 	printLines(sorted, options)
 }
 
