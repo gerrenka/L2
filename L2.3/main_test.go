@@ -23,8 +23,7 @@ func TestUnpackString(t *testing.T) {
 
     for _, test := range tests {
         result, err := unpackString(test.input)
-        
-        // Проверка на наличие ошибки
+
         if test.hasError && err == nil {
             t.Errorf("Ожидалась ошибка для входной строки: %q", test.input)
             continue
@@ -35,7 +34,6 @@ func TestUnpackString(t *testing.T) {
             continue
         }
 
-        // Проверка результата
         if !test.hasError && result != test.expected {
             t.Errorf("Для входной строки %q ожидалось %q, получено %q", 
                      test.input, test.expected, result)

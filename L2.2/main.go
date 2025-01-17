@@ -8,7 +8,6 @@ import (
 	"github.com/beevik/ntp"
 )
 
-// Список NTP серверов для попытки подключения
 var ntpServers = []string{
 	"pool.ntp.org",
 	"time.google.com",
@@ -17,18 +16,16 @@ var ntpServers = []string{
 }
 
 func main() {
-	// Получаем локальное время
+
 	localTime := time.Now()
 	fmt.Printf("Локальное время: %v\n", localTime.Format(time.RFC3339))
 
-	// Пробуем получить время с разных серверов
 	var ntpTime time.Time
 	var lastErr error
 	
 	for _, server := range ntpServers {
 		fmt.Printf("Попытка подключения к %s...\n", server)
-		
-		// Устанавливаем увеличенный таймаут в 5 секунд
+
 		ntpTime, lastErr = ntp.Time(server)
 		if lastErr == nil {
 			fmt.Printf("Успешное подключение к %s\n", server)
